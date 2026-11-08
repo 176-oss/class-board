@@ -391,6 +391,8 @@ phoneWarning(text): string[]     // 찾은 전화번호 모양 글 목록 (없�
 export const API = 'https://www.googleapis.com/drive/v3/files';
 export const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 export const DOWNLOAD = 'https://www.googleapis.com/download/drive/v3/files';
+// 본문 읽기 주소는 인증 방식에 따라 다르다: 키(표시 화면)는 mediaUrl = DOWNLOAD, 토큰(입력 화면)은 authMediaUrl = API?alt=media.
+// DOWNLOAD 는 Authorization 사전 확인(OPTIONS)에 503을 줘 브라우저가 막는다 (2026-11-09 확인).
 export const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata';
 // drive.appdata는 이력(appDataFolder)에 필요. 2026-11-08 사용자 결정으로 두 권한 모두 쓴다.
 metaUrl(fileId, key = ''): `${API}/${enc(id)}?fields=version,modifiedTime` + (key ? `&key=${enc(key)}` : '')

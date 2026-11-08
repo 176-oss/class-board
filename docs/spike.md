@@ -4,6 +4,7 @@
 
 본 개발에 넘길 것
 - 본문·이미지는 `https://www.googleapis.com/download/drive/v3/files/{id}?alt=media&key=` 로 읽는다 (`/drive/v3/files/{id}?alt=media`는 구글 자동 요청 차단 페이지가 CORS 없이 와서 fetch 실패).
+- 로그인 토큰을 붙여 읽을 때(입력 화면)는 반대로 기본 주소 `/drive/v3/files/{id}?alt=media`를 쓴다. 다운로드 주소는 `Authorization` 헤더의 사전 확인(OPTIONS)에 503을 돌려줘 브라우저가 막는다 (2026-11-09, 배포 후 입력 화면에서 발견).
 - 동시 저장은 `rev` + 저장 직전 `files.get?fields=version` 비교 (If-Match 무시됨, 응답 ETag 헤더도 안 보임).
 - 가려진 탭은 타이머가 1분 단위로 늦춰진다. 표시 화면의 매분 확인이 최대 약 1분 더 늦을 수 있고, 학급 PC는 전체화면이라 보통은 해당 없음. 필요하면 워커 타이머.
 - 키 참조 제한은 `Referer` 또는 `Origin`으로 통과한다. 둘 다 없는 요청만 막힌다. 표시 화면에 `no-referrer` 정책을 쓰지 않는다는 기획서 5절 규칙은 `<img>` 때문에 그대로 필요.

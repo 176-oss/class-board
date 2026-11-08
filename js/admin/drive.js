@@ -1,6 +1,6 @@
 // 진짜 구글 드라이브 AdminDrive (계약 5-2~5-4). 구글 로그인 스크립트는 로그인할 때만 넣는다.
 import { GOOGLE_CLIENT_ID } from '../../config.js';
-import { API, UPLOAD, SCOPES, DriveError, ADMIN_MESSAGES, classifyDriveError, metaUrl, mediaUrl } from '../core/drive-common.js';
+import { API, UPLOAD, SCOPES, DriveError, ADMIN_MESSAGES, classifyDriveError, metaUrl, authMediaUrl } from '../core/drive-common.js';
 import { isValidFileId, randomId, boardFileName, imageFileName, historyFileName, parseHistoryName } from '../core/ids.js';
 import { SHARE_BODY, findShare, historyToDelete } from '../core/edit.js';
 
@@ -183,7 +183,7 @@ export function createAdminDrive() {
       return { id: made.id, ...(await getMeta(made.id)) };
     },
     getMeta,
-    readText: (fileId) => req(mediaUrl(fileId), { as: 'text' }),
+    readText: (fileId) => req(authMediaUrl(fileId), { as: 'text' }),
     async saveBoard(fileId, text) {
       const j = await req(`${UPLOAD}/${id(fileId)}?uploadType=media&fields=version,modifiedTime`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json; charset=UTF-8' }, body: text, op: 'write',
@@ -196,7 +196,7 @@ export function createAdminDrive() {
       const made = await createShared({ name: imageFileName(), mimeType: 'image/jpeg', appProperties: { classboard: 'image', board: boardId } }, jpegBlob, 'image/jpeg', shared);
       return { id: made.id };
     },
-    readImage: (fileId) => req(mediaUrl(fileId), { as: 'blob' }),
+    readImage: (fileId) => req(authMediaUrl(fileId), { as: 'blob' }),
     async shareState(fileId) {
       return findShare(await listPerms(fileId)).ok ? 'shared' : 'stopped';
     },

@@ -1,5 +1,5 @@
 // 표시 화면 서비스 워커 (계약 8절). SHELL 파일이나 config.js 를 바꾸는 커밋은 VERSION 을 반드시 올린다.
-const VERSION = '20261109-3';
+const VERSION = '20261109-4';
 const CACHE = 'classboard:shell:' + VERSION;
 const SHELL = [
   './',
