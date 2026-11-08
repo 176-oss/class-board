@@ -88,7 +88,7 @@ async function login() {
     const domain = email.split('@')[1] || '?';
     $('who').textContent = `로그인됨 (${domain === 'gmail.com' ? '개인 계정' : '도메인 ' + domain})`;
     log('로그인', true, `계정 종류: ${domain === 'gmail.com' ? '개인 gmail' : '워크스페이스 ' + domain}`);
-    for (const id of ['t1', 't4', 't6', 't3', 't3once', 'unshare', 'cleanup']) $(id).disabled = false;
+    for (const id of ['t1', 't4', 't6', 't3', 't3once', 'unshare', 'cleanup', 'tAuto']) $(id).disabled = false;
   } catch (e) { log('로그인', false, String(e)); }
 }
 
@@ -326,7 +326,70 @@ function read5() {
   timer = setInterval(tick, 60000);
 }
 
-function stop() { if (timer) { clearInterval(timer); timer = null; say('멈춤'); } }
+// ---------- 자동 진행 (3번 측정 뒤 남은 시험을 버튼 하나로) ----------
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+let autoRun = 0; // 멈춤을 누르면 바뀌어서 진행 중인 자동 순서가 끝난다
+
+// 학급 PC 창: 2·4 → 매분 확인(5) → 선생님 창이 공유를 끊으면 막히는지(16절 7) 확인
+async function readerAuto() {
+  const f = param('f');
+  if (!needKey('자동(학급 PC)') || !f) { if (!f) log('자동(학급 PC)', false, '주소에 f= 가 없습니다'); return; }
+  stop();
+  const run = ++autoRun;
+  log('자동(학급 PC)', null, '시작. 이 창을 닫지 마세요. 약 15분 걸립니다');
+  await read2();
+  await read4();
+  const start = Date.now();
+  let lastVersion = null; let reqs = 0; let errs = 0; let changes = 0;
+  while (run === autoRun && Date.now() - start < 25 * 60000) {
+    const m = await call(pub(f, 'fields=version,modifiedTime')); reqs += 1;
+    const min = Math.floor((Date.now() - start) / 60000);
+    if (!m.ok) {
+      if (min >= 10) { // 선생님 창이 11분쯤 공유를 끊는다
+        log('5 매분 확인 결과', errs === 0, `${min}분 동안 요청 ${reqs - 1}회, 오류 ${errs}회, 변경 감지 ${changes}회`);
+        log('공유 끊은 뒤 읽기', true, `막힘 확인: ${brief(m)}`);
+        await read2();
+        log('자동(학급 PC)', null, '끝. [결과 전체 복사]를 눌러 보내 주세요');
+        return say('자동 끝');
+      }
+      errs += 1; log('5 오류', false, brief(m));
+    } else if (m.json.version !== lastVersion) {
+      const b = await call(pub(f, 'alt=media')); reqs += 1;
+      if (!b.ok) { errs += 1; log('5 오류', false, brief(b)); } else if (lastVersion !== null) changes += 1;
+      lastVersion = m.json.version;
+    }
+    say(`자동: 매분 확인 ${min}분 경과, 요청 ${reqs}, 오류 ${errs}, 변경 ${changes}`);
+    await wait(60000);
+  }
+  if (run === autoRun) log('자동(학급 PC)', false, '25분 안에 공유 끊기를 못 봤습니다. 선생님 창 결과를 확인해 주세요');
+}
+
+// 선생님 창: 6 If-Match → 3분 30초마다 수정 3회(5번 변경 감지용) → 공유 끊기 → 3분 뒤 시험 파일 삭제
+async function teacherAuto() {
+  if (!files().board) { log('자동(선생님)', false, '먼저 1번 시험으로 파일을 만드세요'); return; }
+  stop();
+  const run = ++autoRun;
+  log('자동(선생님)', null, '시작. 이 창을 닫지 마세요. 약 15분 걸립니다. 학급 PC 창 자동을 먼저 켰는지 확인하세요');
+  await test6();
+  for (let i = 1; i <= 3; i += 1) {
+    say(`자동: 수정 ${i}/3 대기 중`);
+    await wait(210000);
+    if (run !== autoRun) return;
+    await writeOnce(`5용 수정 ${i}/3`);
+  }
+  await wait(60000);
+  if (run !== autoRun) return;
+  await unshare();
+  say('자동: 공유 끊음, 3분 뒤 시험 파일 삭제');
+  await wait(180000);
+  if (run !== autoRun) return;
+  await cleanup();
+  log('자동(선생님)', null, '끝. [결과 전체 복사]를 눌러 보내 주세요');
+  say('자동 끝');
+}
+
+function stop() {
+  autoRun += 1; if (timer) { clearInterval(timer); timer = null; say('멈춤'); } }
 
 // ---------- 시작 ----------
 $('origin').textContent = location.origin;
@@ -345,6 +408,8 @@ $('t3once').onclick = () => writeOnce('수정 1회');
 $('unshare').onclick = unshare;
 $('cleanup').onclick = cleanup;
 $('copyUrl').onclick = () => navigator.clipboard.writeText($('readerUrl').textContent).then(() => say('주소 복사됨'));
+$('tAuto').onclick = teacherAuto;
+$('rAuto').onclick = readerAuto;
 $('r2').onclick = read2;
 $('r4').onclick = read4;
 $('r3').onclick = read3;
