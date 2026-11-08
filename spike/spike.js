@@ -23,6 +23,9 @@ function workerTimer(ms, fn, once) {
 }
 const every = (fn, ms) => workerTimer(ms, fn, false);
 const lines = [];
+// ?auto=read 로 열면 2·4번을 바로 돌리고 기록을 저장소에도 남긴다 (앱 모드 창 결과를 다른 탭에서 읽으려고)
+const AUTO = new URLSearchParams(location.search).get('auto') === 'read';
+const LOG_STORE = 'classboard:spike:applog';
 
 // ---------- 기록 ----------
 function log(item, ok, text) {
@@ -30,6 +33,7 @@ function log(item, ok, text) {
   const mark = ok === true ? '통과' : ok === false ? '실패' : '정보';
   const line = `[${t}] ${item} ${mark}: ${text}`;
   lines.push(line);
+  if (AUTO) try { localStorage.setItem(LOG_STORE, JSON.stringify([...JSON.parse(localStorage.getItem(LOG_STORE) || '[]'), line].slice(-50))); } catch { /* 기록 실패는 넘어감 */ }
   const li = document.createElement('li');
   li.className = ok === true ? 'ok' : ok === false ? 'fail' : '';
   li.textContent = line;
@@ -245,7 +249,7 @@ async function read2() {
   const f = param('f');
   if (!needKey('2 읽기')) return;
   if (!f) { log('2 읽기', false, '주소에 올바른 f= 파일 ID가 없습니다'); return; }
-  log('2·7 환경', null, `페이지 버전 5, 본문 주소 ${DOWNLOAD.split('/')[3]}, 출처 ${location.origin}, 창 도구막대 보임=${window.toolbar.visible}, ${navigator.userAgent.match(/(Edg|Chrome)\/[\d.]+/g)?.join(' ') || navigator.userAgent}`);
+  log('2·7 환경', null, `페이지 버전 6, 본문 주소 ${DOWNLOAD.split('/')[3]}, 출처 ${location.origin}, 창 도구막대 보임=${window.toolbar.visible}, ${navigator.userAgent.match(/(Edg|Chrome)\/[\d.]+/g)?.join(' ') || navigator.userAgent}`);
   const m = await call(pub(f, 'fields=version,modifiedTime'));
   log('2 메타 읽기', m.ok, brief(m));
   const b = await call(pub(f, 'alt=media'));
@@ -426,3 +430,4 @@ $('r3').onclick = read3;
 $('r5').onclick = read5;
 $('stop').onclick = stop;
 $('copyLog').onclick = () => navigator.clipboard.writeText(lines.join('\n')).then(() => say('결과 복사됨. 대화창에 붙여 넣어 주세요'));
+if (AUTO) read2().then(read4);
