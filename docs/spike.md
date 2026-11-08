@@ -67,10 +67,10 @@
 
 | 번호 | 개인 계정 | 학교 계정 | 판정 |
 |---|---|---|---|
-| 1 공유 만들기와 확인 | | | 미확인 |
-| 2 로그인 없이 읽기, 오류 본문, Content-Type | 메타 200 `application/json; charset=UTF-8` 290~400ms. 본문(다운로드 주소) 200 `application/json` 830ms. 없는 ID·공유 안 한 파일 모두 404 `notFound` JSON, 본문 읽힘 (20:34, 버전 4) | | **통과** (개인 계정). 본문은 `/download/drive/v3/files/` 주소 필수 |
-| 3 반영 지연 (10회 최대) | | | 미확인 |
-| 4 이미지 (blob / img src) | | | 미확인 |
+| 1 공유 만들기와 확인 | 파일 생성 version=1, `permissions.create` 200, `permissions.list`에 `{id:'anyoneWithLink', type:'anyone', role:'reader', allowFileDiscovery:false}` 확인. 이미지 파일도 같음 (20:47) | | **통과** (개인 계정) |
+| 2 로그인 없이 읽기, 오류 본문, Content-Type | 메타 200 `application/json; charset=UTF-8` 290~400ms. 본문(다운로드 주소) 200 `application/json` 830ms. 없는 ID·공유 안 한 파일 모두 404 `notFound` JSON, 본문 읽힘 (20:34, 버전 4) | | **통과** (개인 계정, 20:34 선생님 실행과 20:47 Claude 실행 모두). 본문은 `/download/drive/v3/files/` 주소 필수 |
+| 3 반영 지연 (10회 최대) | 10회 모두 본문 3초, version 2초 (3초 간격 측정, 워커 타이머, 21:10). 최대 3초 | | **통과** (목표 60초 이하) |
+| 4 이미지 (blob / img src) | 9,327바이트 JPEG. `fetch`→blob 표시됨(`image/jpeg`), `<img src=다운로드 주소&key=>` 표시됨 (20:47) | | **통과** (둘 다 됨) |
 | 5 매분 확인 10분 이상 한도 오류 | | | 미확인 |
 | 6 If-Match | 저장 전 version=19, 틀린 `If-Match`로 `files.update` → 저장됨 version=20. 응답 ETag 헤더 안 보임 (20:37, 선생님 창). 학급 PC 창에서도 그 내용(`rev:-1`) 읽힘 | | **미지원 확정**. 막는 문제 아님: 기획서 9절 `rev` + 저장 직전 `files.get?fields=version` 비교로 간다 |
 | 7 참조 제한 (fetch / 앱 모드) | 참조 없이 보낸 요청이 200 (20:31, 20:34). 키 제한 미적용 상태 | | **미확인** (키 설정 확인 후 재시험) |
