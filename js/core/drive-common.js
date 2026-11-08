@@ -75,8 +75,14 @@ export function metaUrl(fileId, key = '') {
   return `${API}/${checkedId(fileId)}?fields=version,modifiedTime${keyPart(key)}`;
 }
 
+// 키로 읽을 때(표시 화면): 기본 주소는 키 요청에 CORS 없는 차단 페이지를 줄 때가 있어 다운로드 주소.
+// 토큰으로 읽을 때(입력 화면): 다운로드 주소는 Authorization 사전 확인(OPTIONS)에 503을 줘서 기본 주소.
 export function mediaUrl(fileId, key = '') {
   return `${DOWNLOAD}/${checkedId(fileId)}?alt=media${keyPart(key)}`;
+}
+
+export function authMediaUrl(fileId) {
+  return `${API}/${checkedId(fileId)}?alt=media`;
 }
 
 // 배포 주소에서는 ?dev=1 이어도 켜지지 않는다 (가짜 데이터가 배포 출처에 써지지 않게).

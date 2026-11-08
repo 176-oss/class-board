@@ -1,12 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { metaUrl, mediaUrl, classifyDriveError, DriveError, ADMIN_MESSAGES, isFakeMode, SCOPES } from '../js/core/drive-common.js';
+import { metaUrl, mediaUrl, authMediaUrl, classifyDriveError, DriveError, ADMIN_MESSAGES, isFakeMode, SCOPES } from '../js/core/drive-common.js';
 
 const ID = 'Ab_-0123456789abcdefgh';
 
 test('주소: 본문은 download 주소, 키는 인코딩', () => {
   assert.equal(metaUrl(ID), `https://www.googleapis.com/drive/v3/files/${ID}?fields=version,modifiedTime`);
   assert.equal(mediaUrl(ID, 'k&y'), `https://www.googleapis.com/download/drive/v3/files/${ID}?alt=media&key=k%26y`);
+  assert.equal(authMediaUrl(ID), `https://www.googleapis.com/drive/v3/files/${ID}?alt=media`);
+  assert.throws(() => authMediaUrl('../x'), (e) => e instanceof DriveError && e.kind === 'invalid');
 });
 
 test('주소: 잘못된 파일 ID 는 invalid 를 던진다', () => {
