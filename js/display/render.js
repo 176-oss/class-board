@@ -176,9 +176,9 @@ function pageDuty(el, page) {
 }
 
 // ctx: nowMs, page(몇 번째 안내 페이지), imageUrl(fileId → 주소 또는 null), notes(구석 경고 줄), badge(구석 왼쪽 글).
-// 돌려줌: { pageCount(안내 쪽 수), dutyPages(당번 쪽 수), pageSec } 넘기기 예약용. page 는 계속 늘어나는 수여도 된다.
+// ctx.dutyPage: 당번 쪽 번호(없으면 page). 돌려줌: { pageCount(안내 쪽 수), dutyPages(당번 쪽 수), pageSec, dutySec } 넘기기 예약용. page 는 계속 늘어나는 수여도 된다.
 export function renderBoard(root, board, ctx = {}) {
-  const { nowMs = Date.now(), page = 0, imageUrl = () => null, notes = [], badge = '' } = ctx;
+  const { nowMs = Date.now(), page = 0, dutyPage = page, imageUrl = () => null, notes = [], badge = '' } = ctx;
   const d = board.design;
   const today = seoulNow(nowMs);
   prepare(root, d.palette, d.fontScale);
@@ -244,9 +244,9 @@ export function renderBoard(root, board, ctx = {}) {
   root.append(main, foot(notes, badge));
 
   const duty = rest.querySelector('[data-block="duty"]');
-  const dutyPages = duty ? pageDuty(duty, page) : 1;
+  const dutyPages = duty ? pageDuty(duty, dutyPage) : 1;
   for (const el of fits) fit(el, el === title);
   const cur = paged.pages[pageIndex];
   // 안내가 한 쪽이면 당번 쪽은 rotateSec 마다 넘긴다.
-  return { pageCount: paged.pages.length, dutyPages, pageSec: cur && paged.pages.length > 1 ? cur.sec : d.rotateSec };
+  return { pageCount: paged.pages.length, dutyPages, pageSec: cur && paged.pages.length > 1 ? cur.sec : d.rotateSec, dutySec: d.rotateSec };
 }

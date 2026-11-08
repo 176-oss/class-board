@@ -29,9 +29,10 @@ let source = null;
 let reg = null;
 let checkTimer = 0;
 let pageTimer = 0;
+let dutyTimer = 0;
 let checking = false;
 const state = {
-  board: null, seenVersion: null, lastOk: null, lastCheck: 0, fails: 0, notFound: 0, page: 0,
+  board: null, seenVersion: null, lastOk: null, lastCheck: 0, fails: 0, notFound: 0, page: 0, dutyPage: 0,
   badAddress: false, needsUpdate: false, readFailed: false, forbidden: false,
 };
 
@@ -57,15 +58,12 @@ function notes() {
   return out;
 }
 
-function schedulePage({ pageCount, dutyPages = 1, pageSec }) {
-  if (Math.max(pageCount, dutyPages) <= 1) { clearTimeout(pageTimer); pageTimer = 0; return; }
-  if (pageTimer) return;
-  pageTimer = setTimeout(() => {
-    pageTimer = 0;
-    // 안내와 당번 쪽 수가 달라 render 가 각각 나머지를 구한다.
-    state.page++;
-    draw();
-  }, pageSec * 1000);
+// 당번 쪽은 안내 쪽(긴 안내는 1분 넘게 머묾)과 따로 rotateSec 마다 넘겨, 자기 구역을 오래 기다리지 않게 한다.
+function schedulePage({ pageCount, dutyPages = 1, pageSec, dutySec }) {
+  if (pageCount <= 1) { clearTimeout(pageTimer); pageTimer = 0; }
+  else if (!pageTimer) pageTimer = setTimeout(() => { pageTimer = 0; state.page++; draw(); }, pageSec * 1000);
+  if (dutyPages <= 1) { clearTimeout(dutyTimer); dutyTimer = 0; }
+  else if (!dutyTimer) dutyTimer = setTimeout(() => { dutyTimer = 0; state.dutyPage++; draw(); }, (dutySec || pageSec) * 1000);
 }
 
 function draw() {
@@ -74,7 +72,7 @@ function draw() {
   applyPalette(document.documentElement, palette);
   if (state.badAddress) return renderMessage(root, DISPLAY_TEXT.badAddress, DISPLAY_TEXT.badAddressSub, ctx);
   if (!state.board) return renderMessage(root, DISPLAY_TEXT.connecting, DISPLAY_TEXT.connectingSub, ctx);
-  schedulePage(renderBoard(root, state.board, { ...ctx, nowMs: now(), page: state.page, imageUrl }));
+  schedulePage(renderBoard(root, state.board, { ...ctx, nowMs: now(), page: state.page, dutyPage: state.dutyPage, imageUrl }));
 }
 
 // 공유를 끊거나 지운 내용이 이 PC에 남지 않게 한다.
