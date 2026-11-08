@@ -79,8 +79,7 @@ export function mediaUrl(fileId, key = '') {
   return `${DOWNLOAD}/${checkedId(fileId)}?alt=media${keyPart(key)}`;
 }
 
+// 배포 주소에서는 ?dev=1 이어도 켜지지 않는다 (가짜 데이터가 배포 출처에 써지지 않게).
 export function isFakeMode({ hostname = '', search = '' } = {}) {
-  const dev = new URLSearchParams(search).get('dev');
-  const local = ['localhost', '127.0.0.1', '[::1]'].includes(hostname) || hostname.endsWith('.localhost');
-  return (local && dev !== '0') || dev === '1';
+  return ['localhost', '127.0.0.1', '[::1]'].includes(hostname) && new URLSearchParams(search).get('dev') !== '0';
 }

@@ -89,9 +89,10 @@ async function createFile(meta, part, partType, fields = 'id,name,version,modifi
   return req(`${UPLOAD}?uploadType=multipart&fields=${fields}`, { method: 'POST', headers: { 'Content-Type': type }, body, op: 'write' });
 }
 
+// 'share'(→ shareBlocked 문구)는 공유 만들기에만. 목록 읽기·지우기의 403은 forbidden 이다 (계약 5-3).
 const listPerms = async (fileId) =>
-  (await req(`${API}/${id(fileId)}/permissions?fields=${enc('permissions(id,type,role,allowFileDiscovery)')}`, { op: 'share' })).permissions ?? [];
-const deletePerm = (fileId, permId) => req(`${API}/${id(fileId)}/permissions/${enc(permId)}`, { method: 'DELETE', op: 'share', as: null });
+  (await req(`${API}/${id(fileId)}/permissions?fields=${enc('permissions(id,type,role,allowFileDiscovery)')}`, { op: 'read' })).permissions ?? [];
+const deletePerm = (fileId, permId) => req(`${API}/${id(fileId)}/permissions/${enc(permId)}`, { method: 'DELETE', op: 'write', as: null });
 
 // 계약 5-7: 만들고, 목록으로 확인하고, 안 보이면 2초 뒤 한 번 더.
 async function shareFile(fileId) {
@@ -109,10 +110,10 @@ async function shareFile(fileId) {
   throw unconfirmed();
 }
 
-async function createShared(meta, part, partType) {
+async function createShared(meta, part, partType, share = true) {
   const made = await createFile(meta, part, partType);
   try {
-    await shareFile(made.id);
+    if (share) await shareFile(made.id);
   } catch (e) {
     await deleteFile(made.id).catch(() => {});
     throw e;
@@ -190,8 +191,9 @@ export function createAdminDrive() {
       return { version: String(j.version), modifiedTime: j.modifiedTime };
     },
     async uploadImage(boardId, jpegBlob) {
-      id(boardId);
-      const made = await createShared({ name: imageFileName(), mimeType: 'image/jpeg', appProperties: { classboard: 'image', board: boardId } }, jpegBlob, 'image/jpeg');
+      // 게시판이 '공유 중지됨'이면 새 이미지도 공유하지 않는다. [다시 공유하기]가 모든 이미지를 함께 공유한다.
+      const shared = findShare(await listPerms(boardId)).ok;
+      const made = await createShared({ name: imageFileName(), mimeType: 'image/jpeg', appProperties: { classboard: 'image', board: boardId } }, jpegBlob, 'image/jpeg', shared);
       return { id: made.id };
     },
     readImage: (fileId) => req(mediaUrl(fileId), { as: 'blob' }),

@@ -140,15 +140,43 @@ function dutyBlock(board, date) {
     el.append(h('div', '', `청소당번은 ${monthDay(d.startDate)}부터`));
     return el;
   }
+  // 메모도 구역과 같은 목록에 넣어, 넘치면 다음 쪽으로 간다.
   el.append(h('div', 'cb-zones', d.zones.map((z) =>
     h('div', '', h('span', 'cb-zone-name', `${z.name}: `),
-      z.students.length ? z.students.map((s, i) => [i ? ', ' : '', h('span', 'cb-nowrap', s.label)]) : '없음'))));
-  if (board.duty.note) el.append(h('div', 'cb-note', board.duty.note));
+      z.students.length ? z.students.map((s, i) => [i ? ', ' : '', h('span', 'cb-nowrap', s.label)]) : '없음')),
+  board.duty.note ? h('div', 'cb-note', board.duty.note) : null));
   return el;
 }
 
+// 당번 칸이 넘치면 글자를 줄이지 않고 들어가는 만큼씩 쪽으로 나눈다. 돌려줌: 쪽 수.
+// 구역 하나도 안 들어가는 쪽만 뒤의 fit 이 글자를 줄인다.
+function pageDuty(el, page) {
+  const list = el.querySelector('.cb-zones');
+  if (!list) return 1;
+  const items = [...list.children];
+  const over = () => el.scrollHeight > el.clientHeight + 1;
+  if (!over()) return 1;
+  const pages = [];
+  let start = 0;
+  for (const it of items) it.hidden = true;
+  items.forEach((it, i) => {
+    it.hidden = false;
+    if (i > start && over()) {
+      for (let j = start; j < i; j++) items[j].hidden = true;
+      pages.push([start, i]);
+      start = i;
+    }
+  });
+  pages.push([start, items.length]);
+  const k = ((page % pages.length) + pages.length) % pages.length;
+  const [a, b] = pages[k];
+  items.forEach((it, i) => { it.hidden = i < a || i >= b; });
+  if (pages.length > 1) el.firstChild.append(h('span', 'cb-page', `${k + 1} / ${pages.length}`));
+  return pages.length;
+}
+
 // ctx: nowMs, page(몇 번째 안내 페이지), imageUrl(fileId → 주소 또는 null), notes(구석 경고 줄), badge(구석 왼쪽 글).
-// 돌려줌: { pageCount, pageSec } 안내 넘기기 예약용.
+// 돌려줌: { pageCount(안내 쪽 수), dutyPages(당번 쪽 수), pageSec } 넘기기 예약용. page 는 계속 늘어나는 수여도 된다.
 export function renderBoard(root, board, ctx = {}) {
   const { nowMs = Date.now(), page = 0, imageUrl = () => null, notes = [], badge = '' } = ctx;
   const d = board.design;
@@ -215,7 +243,10 @@ export function renderBoard(root, board, ctx = {}) {
   if (rest.childElementCount) main.append(rest);
   root.append(main, foot(notes, badge));
 
+  const duty = rest.querySelector('[data-block="duty"]');
+  const dutyPages = duty ? pageDuty(duty, page) : 1;
   for (const el of fits) fit(el, el === title);
   const cur = paged.pages[pageIndex];
-  return { pageCount: paged.pages.length, pageSec: cur ? cur.sec : d.rotateSec };
+  // 안내가 한 쪽이면 당번 쪽은 rotateSec 마다 넘긴다.
+  return { pageCount: paged.pages.length, dutyPages, pageSec: cur && paged.pages.length > 1 ? cur.sec : d.rotateSec };
 }

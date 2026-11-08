@@ -41,10 +41,12 @@ test('isFakeMode', () => {
   assert.equal(isFakeMode({ hostname: 'localhost', search: '' }), true);
   assert.equal(isFakeMode({ hostname: '127.0.0.1', search: '?f=x' }), true);
   assert.equal(isFakeMode({ hostname: '[::1]', search: '' }), true);
-  assert.equal(isFakeMode({ hostname: 'board.localhost', search: '' }), true);
+  assert.equal(isFakeMode({ hostname: 'localhost', search: '?dev=1' }), true);
+  assert.equal(isFakeMode({ hostname: 'board.localhost', search: '' }), false);
   assert.equal(isFakeMode({ hostname: 'localhost', search: '?dev=0' }), false);
   assert.equal(isFakeMode({ hostname: '176-oss.github.io', search: '' }), false);
-  assert.equal(isFakeMode({ hostname: '176-oss.github.io', search: '?dev=1' }), true);
+  assert.equal(isFakeMode({ hostname: '176-oss.github.io', search: '?dev=1' }), false);
+  assert.equal(isFakeMode({ hostname: '176-oss.github.io', search: '?dev=1&seed=worst' }), false);
   assert.equal(isFakeMode({ hostname: 'localhost.evil.com', search: '' }), false);
 });
 

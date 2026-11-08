@@ -57,12 +57,13 @@ function notes() {
   return out;
 }
 
-function schedulePage({ pageCount, pageSec }) {
-  if (pageCount <= 1) { clearTimeout(pageTimer); pageTimer = 0; return; }
+function schedulePage({ pageCount, dutyPages = 1, pageSec }) {
+  if (Math.max(pageCount, dutyPages) <= 1) { clearTimeout(pageTimer); pageTimer = 0; return; }
   if (pageTimer) return;
   pageTimer = setTimeout(() => {
     pageTimer = 0;
-    state.page = (state.page + 1) % pageCount;
+    // 안내와 당번 쪽 수가 달라 render 가 각각 나머지를 구한다.
+    state.page++;
     draw();
   }, pageSec * 1000);
 }

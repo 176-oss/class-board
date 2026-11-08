@@ -117,9 +117,10 @@ export function createFakeDrive({ store, now = () => Date.now() }) {
     },
     async uploadImage(boardId, blob) {
       await gate('uploadImage');
+      const shared = findShare((await file(boardId)).f.perms).ok; // 진짜처럼: 게시판이 공유 중지면 공유하지 않음
       const made = await create({ name: imageFileName(), mimeType: 'image/jpeg', appProperties: { classboard: 'image', board: boardId } }, blob);
       try {
-        await shareFile(made.id);
+        if (shared) await shareFile(made.id);
       } catch (e) {
         await remove(made.id);
         throw e;

@@ -443,7 +443,7 @@ createBoard(board): Promise<{ id, version, modifiedTime }>   // 5-7 절차 전�
 getMeta(id): Promise<{ version, modifiedTime }>
 readText(id): Promise<string>                                 // 본문 또는 이력
 saveBoard(id, text): Promise<{ version, modifiedTime }>       // PATCH media
-uploadImage(boardId, jpegBlob): Promise<{ id }>               // 만들기 + 공유 + 확인
+uploadImage(boardId, jpegBlob): Promise<{ id }>               // 만들기. 게시판이 공유 중일 때만 공유 + 확인 (중지됨이면 다시 공유할 때 함께)
 readImage(id): Promise<Blob>
 shareState(id): Promise<'shared' | 'stopped'>
 share(id): Promise<void>       unshare(id): Promise<void>      deleteFile(id): Promise<void>
@@ -485,7 +485,7 @@ getImage(fileId): Promise<Blob>
 확인 대화상자 원문: '게시판, 이미지 n개, 이전 버전 m개가 모두 영구 삭제됩니다. 되돌릴 수 없습니다.' + 학급 이름을 그대로 입력해야 [영구 삭제] 버튼이 켜짐. 순서: 이미지 전부 → 이력 전부 → 본 파일 (`files.delete`만, 휴지통 이동 금지). 중간에 실패하면 멈추고 '일부만 삭제되었습니다. 다시 누르면 나머지를 지웁니다' (본 파일이 마지막이라 다시 찾을 수 있음). 끝나면 이 PC의 `classboard:*:<파일ID>` 키도 지운다.
 
 ## 6. 가짜 드라이브 모드
-- 켜짐: `isFakeMode({ hostname, search })` = (hostname이 `localhost`, `127.0.0.1`, `[::1]`이거나 `.localhost`로 끝나고 `dev` 값이 `'0'`이 아님) 또는 `?dev=1`. 표시·입력 화면 모두 같은 함수. 켜지면 구글로 아무것도 보내지 않고 두 화면 구석에 '가짜 드라이브 모드'.
+- 켜짐: `isFakeMode({ hostname, search })` = hostname이 `localhost`, `127.0.0.1`, `[::1]` 중 하나이고 `dev` 값이 `'0'`이 아님. 그 밖의 주소(배포 주소 포함)에서는 `?dev=1`이어도 켜지지 않는다(`seed`도 무시). 표시·입력 화면 모두 같은 함수. 켜지면 구글로 아무것도 보내지 않고 두 화면 구석에 '가짜 드라이브 모드'.
 - `createFakeDrive({ store, now = () => Date.now() })`: AdminDrive 전부 + `asSource()`(DisplaySource) + 시험 도구 `setOffline(bool)`, `failNext(kind, count = 1)`, `blockShare(bool)`(공유 만들기가 `shareBlocked`), `files()`, `calls`.
 - `store`: `{ getText(key), setText(key, v), removeText(key), getBlob(key), setBlob(key, blob), removeBlob(key) }` (모두 Promise). node 테스트는 `Map` 기반 메모리, 브라우저는 `js/fake-store.js`.
 - 브라우저 저장 위치: 목록 `localStorage['classboard:fake:index']` = `{ files: { [id]: { name, mimeType, appProperties, version, modifiedTime, parents, perms: [] } } }`, 본문 `localStorage['classboard:fake:text:<id>']`, 이미지 Cache Storage `classboard:fake:img`의 `./__fake/<id>`.
@@ -540,7 +540,7 @@ IndexedDB는 쓰지 않는다. 학생 이름 대응표(number 모드)는 어디�
 - 나머지 영역: `layout.order` 순서로 세로로 쌓되, `events`와 `duty`가 이웃이면 한 줄에 나란히 (6:4). `notices`는 남는 높이를 모두 씀. 꺼진 칸(`blocks`)은 빠지고 나머지가 채움.
 - 안내: 제목(600), 본문(`richLines`), 이미지(있으면 그 페이지에 하나, `object-fit: contain`, alt 적용). 페이지 표시 '2 / 5'.
 - 일정: `eventsView` 최대 5개 + '외 n건', 'D-3 현장체험학습 11월 20일'.
-- 청소당번: 구역별 카드 '교실 청소: 3번, 7번, 12번'. before: '청소당번은 11월 9일부터'. 주말·none이면 칸 숨김.
+- 청소당번: 구역별 카드 '교실 청소: 3번, 7번, 12번'. 칸에 다 들어가지 않으면 글자를 줄이지 않고 구역·메모를 쪽으로 나눠 '1 / 3'을 표시하고, 안내와 같은 박자로 넘긴다(안내가 한 쪽이면 `rotateSec`). before: '청소당번은 11월 9일부터'. 주말·none이면 칸 숨김.
 - 배경: `background.kind:'image'`면 화면 전체에 이미지 + `bg`색 `overlay` 덮개. 칸은 `surface` 불투명.
 - 각 칸 요소에 `data-block="timetable|notices|events|duty"`. 최악 데이터(16절 10번)에서 글자가 잘리지 않음 (넘치면 페이지·'외 n건'으로).
 

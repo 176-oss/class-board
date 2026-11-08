@@ -80,6 +80,20 @@ test('이미지: 공유되어 올라가고 board 표시, 삭제하면 사라짐'
   await assert.rejects(d.readImage(img.id), (e) => e.kind === 'notFound');
 });
 
+test('이미지: 게시판이 공유 중지면 새 이미지도 공유하지 않고, 다시 공유하면 함께 공유됨 (L2)', async () => {
+  const { d } = await setup();
+  const { id } = await d.createBoard(defaultBoard('x', clock));
+  await d.unshare(id);
+  const img = await d.uploadImage(id, new Blob(['jpeg']));
+  assert.equal(await d.shareState(img.id), 'stopped');
+  await assert.rejects(d.asSource().getImage(img.id), (e) => e.kind === 'notFound');
+  // [다시 공유하기]와 같은 순서: 이미지들 → 본 파일
+  for (const f of await d.listImages(id)) await d.share(f.id);
+  await d.share(id);
+  assert.equal(await d.shareState(img.id), 'shared');
+  assert.equal(await (await d.asSource().getImage(img.id)).text(), 'jpeg');
+});
+
 test('이력: appDataFolder, 공유 없음, 5개만 rev 내림차순', async () => {
   const { d } = await setup();
   const { id } = await d.createBoard(defaultBoard('x', clock));
