@@ -80,3 +80,7 @@
 
 - 게시판은 `176-oss/class`의 `board/` 폴더가 아니라 새 저장소 `176-oss/class-board`의 루트에 둔다 (2026-11-08 선생님 결정). 기획서의 `board/...` 경로는 루트 기준으로 읽는다 (`board/docs/` → `docs/`, `board/index.html` → `index.html`).
 - 주소는 `https://176-oss.github.io/class-board/`. 출처는 기존 앱과 **같은** `https://176-oss.github.io`라서, 키 참조 제한 `https://176-oss.github.io/*`과 `classboard:` 저장소 접두사 규칙은 그대로 필요하다.
+
+## 시험 중 발견 (2026-11-08)
+
+- 2번 1차: 로그인 없이 `files.get?fields=version`은 200. `drive/v3/files/{id}?alt=media`는 6~9초 뒤 `Failed to fetch`. 같은 주소를 curl로 보면 403 `text/html` 구글 'Sorry... automated queries' 페이지이고 CORS 헤더가 없다 (가짜 키, 없는 ID, 키 없음 모두 같음). 다운로드 전용 주소 `https://www.googleapis.com/download/drive/v3/files/{id}?alt=media&key=`는 JSON 오류와 `Access-Control-Allow-Origin: https://176-oss.github.io`를 정상으로 돌려준다. 시험 페이지의 본문·이미지 읽기를 이 주소로 바꿨다. 본 개발도 본문은 이 주소를 쓴다.

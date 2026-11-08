@@ -224,7 +224,9 @@ function param(name) {
   const v = new URLSearchParams(location.search).get(name);
   return v && ID_RE.test(v) ? v : null; // 형식이 틀리면 요청을 보내지 않는다
 }
-const pub = (id, q) => `${API}/${encodeURIComponent(id)}?${q}&key=${encodeURIComponent(apiKey())}`;
+// 본문은 다운로드 전용 주소로 받는다. /drive/v3/files?alt=media 는 자동 요청 차단 페이지(CORS 없음)를 돌려줄 때가 있다
+const DOWNLOAD = 'https://www.googleapis.com/download/drive/v3/files';
+const pub = (id, q) => `${q === 'alt=media' ? DOWNLOAD : API}/${encodeURIComponent(id)}?${q}&key=${encodeURIComponent(apiKey())}`;
 function needKey(item) {
   if (apiKey()) return true;
   log(item, false, 'API 키가 없습니다. 위 입력칸에 넣고 [키 저장]');
