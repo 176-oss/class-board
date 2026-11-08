@@ -85,3 +85,4 @@
 
 - 2번 1차: 로그인 없이 `files.get?fields=version`은 200. `drive/v3/files/{id}?alt=media`는 6~9초 뒤 `Failed to fetch`. 같은 주소를 curl로 보면 403 `text/html` 구글 'Sorry... automated queries' 페이지이고 CORS 헤더가 없다 (가짜 키, 없는 ID, 키 없음 모두 같음). 다운로드 전용 주소 `https://www.googleapis.com/download/drive/v3/files/{id}?alt=media&key=`는 JSON 오류와 `Access-Control-Allow-Origin: https://176-oss.github.io`를 정상으로 돌려준다. 시험 페이지의 본문·이미지 읽기를 이 주소로 바꿨다. 본 개발도 본문은 이 주소를 쓴다.
 - 7번 1차 (20:31): `referrerPolicy:'no-referrer'`로 보낸 `files.get?fields=version`이 200. 키에 웹사이트(HTTP 리퍼러) 제한이 아직 걸려 있지 않다. 키 설정 확인 뒤 다시 시험.
+- 3번 1차 (20:48, Claude가 크롬 연결로 실행): 1~2회 3초·4초, 3~6회 15·60·45·30초. 75초 수정과 60초 확인이 엇갈린 무늬라, 가려진 탭의 타이머를 크롬이 1분 단위로 늦춘 탓으로 판단해 무효 처리. 측정 타이머를 워커로 옮겨(버전 5) 다시 잰다. 표시 화면도 같은 영향을 받으므로 본 개발에서 매분 확인 타이머의 지연을 고려한다 (최대 약 1분 추가).

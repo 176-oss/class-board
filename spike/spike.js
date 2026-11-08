@@ -14,6 +14,14 @@ const SHARE = { type: 'anyone', role: 'reader', allowFileDiscovery: false };
 const $ = (id) => document.getElementById(id);
 let token = null;
 let timer = null;
+// 크롬은 가려진 탭의 setTimeout/setInterval을 1분 단위로 늦춘다. 워커 안 타이머는 늦추지 않아서 측정에 쓴다
+function workerTimer(ms, fn, once) {
+  const src = `${once ? 'setTimeout' : 'setInterval'}(() => postMessage(0), ${ms})`;
+  const w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  w.onmessage = () => { if (once) w.terminate(); fn(); };
+  return w;
+}
+const every = (fn, ms) => workerTimer(ms, fn, false);
 const lines = [];
 
 // ---------- 기록 ----------
@@ -169,7 +177,7 @@ function test3write() {
     if (n >= 10) { stop(); say('3번 수정 10회 끝'); }
   };
   tick();
-  timer = setInterval(tick, 75000);
+  timer = every(tick, 75000);
 }
 
 async function test6() {
@@ -237,7 +245,7 @@ async function read2() {
   const f = param('f');
   if (!needKey('2 읽기')) return;
   if (!f) { log('2 읽기', false, '주소에 올바른 f= 파일 ID가 없습니다'); return; }
-  log('2·7 환경', null, `페이지 버전 4, 본문 주소 ${DOWNLOAD.split('/')[3]}, 출처 ${location.origin}, 창 도구막대 보임=${window.toolbar.visible}, ${navigator.userAgent.match(/(Edg|Chrome)\/[\d.]+/g)?.join(' ') || navigator.userAgent}`);
+  log('2·7 환경', null, `페이지 버전 5, 본문 주소 ${DOWNLOAD.split('/')[3]}, 출처 ${location.origin}, 창 도구막대 보임=${window.toolbar.visible}, ${navigator.userAgent.match(/(Edg|Chrome)\/[\d.]+/g)?.join(' ') || navigator.userAgent}`);
   const m = await call(pub(f, 'fields=version,modifiedTime'));
   log('2 메타 읽기', m.ok, brief(m));
   const b = await call(pub(f, 'alt=media'));
@@ -279,7 +287,7 @@ function read3() {
   let lastVersion = null; let lastWritten = null; let versionSeenAt = null;
   const delays = [];
   log('3 측정', null, '시작. 선생님 창에서 [3 반영 지연: 75초마다 10회 수정]을 누르세요');
-  timer = setInterval(async () => {
+  timer = every(async () => {
     const m = await call(pub(f, 'fields=version'));
     if (m.ok && m.json.version !== lastVersion) {
       if (lastVersion !== null) versionSeenAt = Date.now();
@@ -325,11 +333,11 @@ function read5() {
     if (min >= 10 && min % 5 === 0) log('5 매분 확인', errs === 0, `${min}분 경과, 요청 ${reqs}회, 오류 ${errs}회, 변경 감지 ${changes}회`);
   };
   tick();
-  timer = setInterval(tick, 60000);
+  timer = every(tick, 60000);
 }
 
 // ---------- 자동 진행 (3번 측정 뒤 남은 시험을 버튼 하나로) ----------
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const wait = (ms) => new Promise((r) => workerTimer(ms, r, true));
 let autoRun = 0; // 멈춤을 누르면 바뀌어서 진행 중인 자동 순서가 끝난다
 
 // 학급 PC 창: 2·4 → 매분 확인(5) → 선생님 창이 공유를 끊으면 막히는지(16절 7) 확인
@@ -391,7 +399,7 @@ async function teacherAuto() {
 }
 
 function stop() {
-  autoRun += 1; if (timer) { clearInterval(timer); timer = null; say('멈춤'); } }
+  autoRun += 1; if (timer) { timer.terminate(); timer = null; say('멈춤'); } }
 
 // ---------- 시작 ----------
 $('origin').textContent = location.origin;
