@@ -1,0 +1,457 @@
+{
+  "kind": "class-board",
+  "schemaVersion": 1,
+  "minReader": 1,
+  "rev": 3,
+  "updatedAt": "2026-11-08T19:30:00+09:00",
+  "title": "3학년 2반",
+  "design": {
+    "template": "basic",
+    "palette": "honey",
+    "fontScale": 1,
+    "layout": {
+      "timetable": "left",
+      "blocks": {
+        "timetable": true,
+        "notices": true,
+        "events": true,
+        "duty": true
+      },
+      "order": [
+        "notices",
+        "events",
+        "duty"
+      ]
+    },
+    "background": {
+      "kind": "color",
+      "imageId": null,
+      "overlay": 0.85
+    },
+    "rotateSec": 15,
+    "showClock": true
+  },
+  "timetable": [
+    {
+      "effectiveFrom": "2026-03-02",
+      "periods": [
+        {
+          "kind": "class",
+          "no": 1,
+          "start": "09:00",
+          "end": "09:40"
+        },
+        {
+          "kind": "class",
+          "no": 2,
+          "start": "09:50",
+          "end": "10:30"
+        },
+        {
+          "kind": "class",
+          "no": 3,
+          "start": "10:40",
+          "end": "11:20"
+        },
+        {
+          "kind": "class",
+          "no": 4,
+          "start": "11:30",
+          "end": "12:10"
+        },
+        {
+          "kind": "break",
+          "start": "12:10",
+          "end": "13:00",
+          "label": "점심"
+        },
+        {
+          "kind": "class",
+          "no": 5,
+          "start": "13:00",
+          "end": "13:40"
+        },
+        {
+          "kind": "class",
+          "no": 6,
+          "start": "13:50",
+          "end": "14:30"
+        }
+      ],
+      "week": {
+        "mon": [
+          {
+            "period": 1,
+            "subject": "국어",
+            "note": ""
+          },
+          {
+            "period": 2,
+            "subject": "수학",
+            "note": ""
+          },
+          {
+            "period": 3,
+            "subject": "사회",
+            "note": ""
+          },
+          {
+            "period": 4,
+            "subject": "체육",
+            "note": "강당"
+          },
+          {
+            "period": 5,
+            "subject": "음악",
+            "note": ""
+          },
+          {
+            "period": 6,
+            "subject": "창체",
+            "note": ""
+          }
+        ],
+        "tue": [
+          {
+            "period": 1,
+            "subject": "수학",
+            "note": ""
+          },
+          {
+            "period": 2,
+            "subject": "국어",
+            "note": ""
+          },
+          {
+            "period": 3,
+            "subject": "과학",
+            "note": ""
+          },
+          {
+            "period": 4,
+            "subject": "영어",
+            "note": ""
+          },
+          {
+            "period": 5,
+            "subject": "미술",
+            "note": ""
+          },
+          {
+            "period": 6,
+            "subject": "미술",
+            "note": ""
+          }
+        ],
+        "wed": [
+          {
+            "period": 1,
+            "subject": "국어",
+            "note": ""
+          },
+          {
+            "period": 2,
+            "subject": "사회",
+            "note": ""
+          },
+          {
+            "period": 3,
+            "subject": "수학",
+            "note": ""
+          },
+          {
+            "period": 4,
+            "subject": "체육",
+            "note": ""
+          },
+          {
+            "period": 5,
+            "subject": "",
+            "note": ""
+          },
+          {
+            "period": 6,
+            "subject": "",
+            "note": ""
+          }
+        ],
+        "thu": [
+          {
+            "period": 1,
+            "subject": "과학",
+            "note": ""
+          },
+          {
+            "period": 2,
+            "subject": "과학",
+            "note": ""
+          },
+          {
+            "period": 3,
+            "subject": "국어",
+            "note": ""
+          },
+          {
+            "period": 4,
+            "subject": "영어",
+            "note": ""
+          },
+          {
+            "period": 5,
+            "subject": "수학",
+            "note": ""
+          },
+          {
+            "period": 6,
+            "subject": "도덕",
+            "note": ""
+          }
+        ],
+        "fri": [
+          {
+            "period": 1,
+            "subject": "국어",
+            "note": ""
+          },
+          {
+            "period": 2,
+            "subject": "수학",
+            "note": ""
+          },
+          {
+            "period": 3,
+            "subject": "체육",
+            "note": ""
+          },
+          {
+            "period": 4,
+            "subject": "사회",
+            "note": ""
+          },
+          {
+            "period": 5,
+            "subject": "실과",
+            "note": ""
+          },
+          {
+            "period": 6,
+            "subject": "창체",
+            "note": ""
+          }
+        ]
+      },
+      "overrides": [
+        {
+          "date": "2026-11-12",
+          "replaceAll": false,
+          "items": [
+            {
+              "period": 3,
+              "subject": "체육",
+              "note": "운동장"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "noClass": [
+    {
+      "startDate": "2026-12-24",
+      "endDate": "2027-02-28",
+      "label": "겨울방학"
+    },
+    {
+      "startDate": "2026-11-17",
+      "endDate": "2026-11-17",
+      "label": "개교기념일"
+    }
+  ],
+  "events": [
+    {
+      "id": "ev1",
+      "date": "2026-11-13",
+      "endDate": null,
+      "time": "",
+      "title": "학부모 공개수업",
+      "note": ""
+    },
+    {
+      "id": "ev2",
+      "date": "2026-11-20",
+      "endDate": null,
+      "time": "09:00",
+      "title": "현장체험학습",
+      "note": "도시락 준비"
+    },
+    {
+      "id": "ev3",
+      "date": "2026-11-09",
+      "endDate": "2026-11-11",
+      "time": "",
+      "title": "독서 주간",
+      "note": ""
+    },
+    {
+      "id": "ev4",
+      "date": "2026-12-03",
+      "endDate": null,
+      "time": "",
+      "title": "2학기 단원평가",
+      "note": ""
+    }
+  ],
+  "notices": [
+    {
+      "id": "n1",
+      "title": "내일은 체육복을 입고 오세요",
+      "body": "3교시 체육은 **운동장**에서 합니다.\n비가 오면 강당으로 옮깁니다.",
+      "important": true,
+      "startDate": "2026-11-01",
+      "endDate": null,
+      "order": 0
+    },
+    {
+      "id": "n2",
+      "title": "도서관 책 반납",
+      "body": "빌린 책은 **금요일까지** 반납합니다.",
+      "important": false,
+      "startDate": "2026-11-01",
+      "endDate": null,
+      "order": 1
+    },
+    {
+      "id": "n3",
+      "title": "우유 당번",
+      "body": "이번 주 우유 당번은 1모둠입니다.\n우유 상자는 급식실 앞에 둡니다.",
+      "important": false,
+      "startDate": "2026-11-01",
+      "endDate": null,
+      "order": 2
+    },
+    {
+      "id": "n4",
+      "title": "현장체험학습 준비물",
+      "body": "도시락, 물, 모자를 챙깁니다.\n**버스 출발 9시**",
+      "important": false,
+      "startDate": "2026-11-01",
+      "endDate": null,
+      "order": 3,
+      "imageId": "im1",
+      "imageAlt": ""
+    }
+  ],
+  "images": [
+    {
+      "id": "im1",
+      "fileId": "fakeseedimage000000000000001",
+      "alt": "현장체험학습 장소 안내 그림",
+      "w": 800,
+      "h": 450
+    }
+  ],
+  "duty": {
+    "zones": [
+      {
+        "id": "z1",
+        "name": "교실 바닥"
+      },
+      {
+        "id": "z2",
+        "name": "칠판"
+      },
+      {
+        "id": "z3",
+        "name": "복도"
+      },
+      {
+        "id": "z4",
+        "name": "분리수거"
+      }
+    ],
+    "students": [
+      {
+        "no": 1
+      },
+      {
+        "no": 2
+      },
+      {
+        "no": 3
+      },
+      {
+        "no": 4
+      },
+      {
+        "no": 5
+      },
+      {
+        "no": 6
+      },
+      {
+        "no": 7
+      },
+      {
+        "no": 8
+      },
+      {
+        "no": 9
+      },
+      {
+        "no": 10
+      },
+      {
+        "no": 11
+      },
+      {
+        "no": 12
+      },
+      {
+        "no": 13
+      },
+      {
+        "no": 14
+      },
+      {
+        "no": 15
+      },
+      {
+        "no": 16
+      },
+      {
+        "no": 17
+      },
+      {
+        "no": 18
+      },
+      {
+        "no": 19
+      },
+      {
+        "no": 20
+      },
+      {
+        "no": 21
+      },
+      {
+        "no": 22
+      },
+      {
+        "no": 23
+      },
+      {
+        "no": 24
+      }
+    ],
+    "nameMode": "number",
+    "mode": "rotate",
+    "rotate": {
+      "startDate": "2026-11-02",
+      "unit": "week",
+      "perZone": 2
+    },
+    "fixed": null,
+    "swaps": [],
+    "note": "청소 끝나면 선생님께 알립니다"
+  }
+}
