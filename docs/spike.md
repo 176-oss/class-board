@@ -84,3 +84,4 @@
 ## 시험 중 발견 (2026-11-08)
 
 - 2번 1차: 로그인 없이 `files.get?fields=version`은 200. `drive/v3/files/{id}?alt=media`는 6~9초 뒤 `Failed to fetch`. 같은 주소를 curl로 보면 403 `text/html` 구글 'Sorry... automated queries' 페이지이고 CORS 헤더가 없다 (가짜 키, 없는 ID, 키 없음 모두 같음). 다운로드 전용 주소 `https://www.googleapis.com/download/drive/v3/files/{id}?alt=media&key=`는 JSON 오류와 `Access-Control-Allow-Origin: https://176-oss.github.io`를 정상으로 돌려준다. 시험 페이지의 본문·이미지 읽기를 이 주소로 바꿨다. 본 개발도 본문은 이 주소를 쓴다.
+- 7번 1차 (20:31): `referrerPolicy:'no-referrer'`로 보낸 `files.get?fields=version`이 200. 키에 웹사이트(HTTP 리퍼러) 제한이 아직 걸려 있지 않다. 키 설정 확인 뒤 다시 시험.
