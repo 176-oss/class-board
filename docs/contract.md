@@ -10,7 +10,7 @@
 - HTML 문자열을 요소에 넣는 속성·메서드(inner/outer HTML 속성, insertAdjacent 계열, document 쓰기), `eval`, `new Function` 금지. 코드와 주석에 그 이름도 쓰지 않는다 (기획서 16절 6번 검색에 걸림). 글은 모두 `textContent`, 서식은 줄바꿈과 `strong` 노드만, `a` 요소 금지.
 - 이모지·장식 기호 문자 금지 (예외: 데이터로서 `masked` 이름의 `○`, 7절). 아이콘은 단색 인라인 SVG.
 - `js/core/` 모듈은 순수 함수만: DOM, `window`, `document`, `localStorage`, `indexedDB`, `caches`, `fetch`, `navigator`를 쓰지 않는다. `Intl`, `TextEncoder`, `crypto.getRandomValues`는 써도 된다. 시각은 항상 인자(`nowMs`)로 받는다 (`Date.now()` 직접 호출 금지).
-- 테스트: `node --test tests/` (Node 26, `node:test` + `node:assert/strict`). 테스트 파일 이름은 `tests/*.test.js`. 루트 `package.json`은 `{ "private": true, "type": "module" }` 한 줄짜리만 둔다 (의존성 없음).
+- 테스트: `node --test tests/` (Node 26, `node:test` + `node:assert/strict`). 테스트 파일 이름은 `tests/*.test.js`. `package.json`은 두지 않는다 (Node 26이 ES 모듈을 알아서 판단). ES 모듈은 import가 먼저 실행되므로, 테스트 첫 줄의 `process.env.TZ` 변경은 import 때 PC 시간대를 쓰지 않는 모듈에만 통한다.
 - 날짜는 'YYYY-MM-DD' 문자열, 시각은 'HH:MM'(24시간) 문자열로 비교한다. 날짜·시각 계산은 모두 `Intl.DateTimeFormat(..., { timeZone: 'Asia/Seoul' })` 기준 (PC 시간대 무시).
 - 파일 ID는 `isValidFileId`를 통과할 때만 쓰고 URL에는 `encodeURIComponent`를 적용한다. 통과하지 않으면 어떤 요청도 보내지 않는다.
 - 문구는 쉬운 한국어, 버튼 이름은 동사로 끝낸다. 이 문서에 원문이 있는 문구는 그대로 쓴다.
@@ -19,7 +19,6 @@
 
 | 경로 | 역할 | 담당 |
 |---|---|---|
-| `package.json` | `{ "private": true, "type": "module" }` | A |
 | `config.js` | 아래 원문 | A |
 | `index.html` | 표시 화면 뼈대, `?f=파일ID`, 외부 스크립트 없음, `<meta name="referrer">` 넣지 않음 | A |
 | `admin.html` | 입력 화면 뼈대 | B |
@@ -321,7 +320,7 @@ phoneWarning(text): string[]     // 찾은 전화번호 모양 글 목록 (없�
 | activeNotices | 정렬 | important false order 0, important true order 5, important true order 1 | true·1, true·5, false·0 |
 | pageNotices | 시간 | rotateSec 15, 글자수 200 한 개 / 80 한 개 | sec 25 / 15 |
 | pageNotices | 나누기 | 글자수 300, 300, 100 | 페이지 [300,300], [100] |
-| pageNotices | 큰 안내 | 540 하나 + 50 | [540], [50] |
+| pageNotices | 큰 안내 | 640 하나 + 50 | [640], [50] |
 | pageNotices | 고정 | important 3개 | pinned 앞 2개 |
 | eventsView | D-n | 오늘 11-10, 일정 11-20 | 'D-10', upcoming |
 | eventsView | 당일·기간 | 11-10 / 11-09~11-11 | 'D-Day' ongoing / 'D-Day' ongoing |
@@ -393,7 +392,7 @@ export const API = 'https://www.googleapis.com/drive/v3/files';
 export const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 export const DOWNLOAD = 'https://www.googleapis.com/download/drive/v3/files';
 export const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata';
-// drive.appdata는 이력(appDataFolder)에 필요. 사용자 결정 대기 항목 (맨 끝 '결정 필요' 1번). 결정 전까지 이 값으로 개발한다.
+// drive.appdata는 이력(appDataFolder)에 필요. 2026-11-08 사용자 결정으로 두 권한 모두 쓴다.
 metaUrl(fileId, key = ''): `${API}/${enc(id)}?fields=version,modifiedTime` + (key ? `&key=${enc(key)}` : '')
 mediaUrl(fileId, key = ''): `${DOWNLOAD}/${enc(id)}?alt=media` + (key ? `&key=${enc(key)}` : '')
 // 둘 다 isValidFileId 실패면 throw new DriveError('invalid'). 본문·이미지는 반드시 DOWNLOAD 주소 (스파이크: /drive/v3/...?alt=media는 CORS 없는 차단 페이지)
