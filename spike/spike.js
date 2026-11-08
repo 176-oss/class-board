@@ -237,7 +237,7 @@ async function read2() {
   const f = param('f');
   if (!needKey('2 읽기')) return;
   if (!f) { log('2 읽기', false, '주소에 올바른 f= 파일 ID가 없습니다'); return; }
-  log('2·7 환경', null, `출처 ${location.origin}, 창 도구막대 보임=${window.toolbar.visible}, ${navigator.userAgent.match(/(Edg|Chrome)\/[\d.]+/g)?.join(' ') || navigator.userAgent}`);
+  log('2·7 환경', null, `페이지 버전 4, 본문 주소 ${DOWNLOAD.split('/')[3]}, 출처 ${location.origin}, 창 도구막대 보임=${window.toolbar.visible}, ${navigator.userAgent.match(/(Edg|Chrome)\/[\d.]+/g)?.join(' ') || navigator.userAgent}`);
   const m = await call(pub(f, 'fields=version,modifiedTime'));
   log('2 메타 읽기', m.ok, brief(m));
   const b = await call(pub(f, 'alt=media'));
