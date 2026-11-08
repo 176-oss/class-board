@@ -1,6 +1,13 @@
 # 스파이크 결과 (기획서 4절)
 
-상태: **1~7번 끝 (2026-11-08 21:32)**. 1~5, 7번 통과. 6번은 미지원 확인(대안 `rev`). 8번 학교 계정 시험 대기
+상태: **스파이크 통과 (2026-11-08 21:37)**. 8개 중 7개 통과, 6번(If-Match)은 미지원이지만 기획서에 대안(`rev`)이 있어 구조 변경 없음. 기획서 3절 구조(drive.file + 링크 공유 + 공개 키 읽기)로 본 개발을 시작해도 된다.
+
+본 개발에 넘길 것
+- 본문·이미지는 `https://www.googleapis.com/download/drive/v3/files/{id}?alt=media&key=` 로 읽는다 (`/drive/v3/files/{id}?alt=media`는 구글 자동 요청 차단 페이지가 CORS 없이 와서 fetch 실패).
+- 동시 저장은 `rev` + 저장 직전 `files.get?fields=version` 비교 (If-Match 무시됨, 응답 ETag 헤더도 안 보임).
+- 가려진 탭은 타이머가 1분 단위로 늦춰진다. 표시 화면의 매분 확인이 최대 약 1분 더 늦을 수 있고, 학급 PC는 전체화면이라 보통은 해당 없음. 필요하면 워커 타이머.
+- 키 참조 제한은 `Referer` 또는 `Origin`으로 통과한다. 둘 다 없는 요청만 막힌다. 표시 화면에 `no-referrer` 정책을 쓰지 않는다는 기획서 5절 규칙은 `<img>` 때문에 그대로 필요.
+- 미확인으로 남은 것: 학급 PC 여러 대 동시 매분 확인(5번은 1대 기준), 다른 학교 도메인(관리자 설정에 따라 다를 수 있음), 엣지 앱 모드.
 시험 페이지: `spike/index.html` → 배포 주소 `https://176-oss.github.io/class-board/spike/`
 
 ## 선생님이 할 일 (순서대로)
@@ -74,7 +81,7 @@
 | 5 매분 확인 10분 이상 한도 오류 | PC 1대(Claude 탭)에서 12분, 요청 17회, 오류 0회, 변경 감지 4회 (21:12~21:24) | | **통과** (1대 기준. 여러 대 동시는 미확인) |
 | 6 If-Match | 저장 전 version=19, 틀린 `If-Match`로 `files.update` → 저장됨 version=20. 응답 ETag 헤더 안 보임 (20:37, 선생님 창). 학급 PC 창에서도 그 내용(`rev:-1`) 읽힘 | | **미지원 확정**. 막는 문제 아님: 기획서 9절 `rev` + 저장 직전 `files.get?fields=version` 비교로 간다 |
 | 7 참조 제한 (fetch / 앱 모드) | 키 설정 확인: 웹사이트 `https://176-oss.github.io/*`, API Google Drive API만 (콘솔, 21:30). 같은 이미지를 `<img>` 기본으로 부르면 표시, `referrerpolicy="no-referrer"`(참조도 출처 헤더도 없음)로 부르면 막힘 (21:32). fetch는 참조를 빼도 `Origin` 헤더를 보내 구글이 그것으로 허용하므로, 시험 페이지의 '참조 없이 fetch' 판정은 쓸 수 없다. 앱 모드 창에서 fetch·이미지 읽기 모두 됨 (21:11) | | **통과** |
-| 8 학교 계정 공유 | - | | 미확인 |
+| 8 학교 계정 공유 | - | 워크스페이스 `ob-m.goedy.kr`: 로그인(drive.file 동의) 됨, 파일 생성·`permissions.create` 200·`permissions.list`에 anyone/reader/allowFileDiscovery false 확인. 키만으로 메타 200, 본문 200(내용 일치), 이미지 표시, 공유 안 한 파일 404. 시험 파일 3개 `files.delete` 204 (21:36~21:37) | **통과** (이 학교 도메인 기준) |
 
 ## 공유 끊기와 삭제 (기획서 16절 7번 일부)
 
