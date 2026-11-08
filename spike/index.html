@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>학급 게시판 스파이크</title>
+<style>
+  :root { --main:#6B4410; --prog:#C98A1B; --bg:#FBEFD5; --text:#2E2418; --line:#E8DCC6; --err:#B42318; --ok:#5B7A2E; }
+  body { margin:0; padding:16px 20px 60px; font:16px/1.5 system-ui, sans-serif; color:var(--text); background:#fff; font-variant-numeric:tabular-nums; }
+  h1 { font-size:22px; color:var(--main); margin:0 0 4px; }
+  h2 { font-size:18px; color:var(--main); margin:24px 0 8px; border-bottom:1px solid var(--line); padding-bottom:4px; }
+  .note { background:var(--bg); border:1px solid var(--line); padding:8px 12px; border-radius:6px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0; }
+  button { min-height:44px; padding:0 16px; font:inherit; color:#fff; background:var(--main); border:0; border-radius:6px; cursor:pointer; }
+  button.sub { background:#fff; color:var(--main); border:1px solid var(--main); }
+  button:disabled { opacity:.5; cursor:default; }
+  button:focus-visible, input:focus-visible { outline:3px solid var(--prog); outline-offset:2px; }
+  input { min-height:40px; padding:0 8px; font:inherit; border:1px solid var(--line); border-radius:6px; width:min(460px, 100%); }
+  code { background:var(--bg); padding:0 4px; border-radius:4px; word-break:break-all; }
+  #log { list-style:none; padding:0; margin:0; }
+  #log li { border-left:4px solid var(--line); padding:4px 10px; margin:4px 0; white-space:pre-wrap; word-break:break-all; font-size:14px; }
+  #log li.ok { border-color:var(--ok); }
+  #log li.fail { border-color:var(--err); }
+  .imgs { display:flex; gap:16px; flex-wrap:wrap; }
+  .imgs figure { margin:0; border:1px solid var(--line); padding:6px; }
+  .imgs img { display:block; width:200px; height:120px; object-fit:contain; background:var(--bg); }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<h1>학급 게시판 스파이크 (시험용)</h1>
+<p class="note">가짜 데이터만 씁니다. 학생 정보는 넣지 마세요. 시험이 끝나면 [시험 파일 모두 삭제]를 누르세요.</p>
+<p>출처: <code id="origin"></code> / 창 종류: <code id="mode"></code></p>
+
+<div class="row">
+  <label for="key">API 키</label>
+  <input id="key" autocomplete="off" spellcheck="false" placeholder="config.js가 비어 있을 때만 필요">
+  <button id="saveKey" class="sub">키 저장(이 브라우저)</button>
+</div>
+
+<section id="teacher">
+  <h2>선생님 창 (구글 로그인)</h2>
+  <div class="row">
+    <button id="login">구글 로그인</button>
+    <span id="who" aria-live="polite"></span>
+  </div>
+  <div class="row">
+    <button id="t1" disabled>1·8 공유 시험 (파일 만들기 + 공유 + 확인)</button>
+    <button id="t4" disabled>4 시험 이미지 만들기</button>
+    <button id="t6" disabled>6 If-Match 시험</button>
+  </div>
+  <div class="row">
+    <button id="t3" disabled>3 반영 지연: 75초마다 10회 수정</button>
+    <button id="t3once" class="sub" disabled>지금 1회 수정</button>
+    <button id="unshare" class="sub" disabled>공유 끊기</button>
+    <button id="cleanup" class="sub" disabled>시험 파일 모두 삭제</button>
+  </div>
+  <p>학급 PC 창 주소: <code id="readerUrl">(1번 시험 후 생김)</code> <button id="copyUrl" class="sub" disabled>주소 복사</button></p>
+</section>
+
+<section id="reader">
+  <h2>학급 PC 창 (로그인 없음)</h2>
+  <p>파일: <code id="ids"></code></p>
+  <div class="row">
+    <button id="r2">2·7 읽기 시험</button>
+    <button id="r4">4 이미지 시험</button>
+    <button id="r3">3 반영 지연 측정 시작</button>
+    <button id="r5">5 매분 확인 (10분 이상)</button>
+    <button id="stop" class="sub">측정 멈춤</button>
+  </div>
+  <div class="imgs" id="imgs" hidden>
+    <figure><img id="imgBlob" alt="fetch와 blob 방식 시험 이미지"><figcaption>fetch→blob</figcaption></figure>
+    <figure><img id="imgDirect" alt="img src 직접 방식 시험 이미지"><figcaption>img src 직접</figcaption></figure>
+  </div>
+</section>
+
+<h2>결과</h2>
+<div class="row"><button id="copyLog">결과 전체 복사</button><span id="status" aria-live="polite"></span></div>
+<ul id="log"></ul>
+
+<script type="module" src="spike.js"></script>
+</body>
+</html>
