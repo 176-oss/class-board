@@ -1,0 +1,25 @@
+/* 학급 게시판 공통 토큰: 글꼴, 크기, 간격, 굵기. 색은 js/core/palette.js 가 유일한 원본이라 여기 두지 않는다. */
+
+@font-face { font-family: "IBM Plex Sans KR"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/IBMPlexSansKR-Regular.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans KR"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/IBMPlexSansKR-Medium.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans KR"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/IBMPlexSansKR-SemiBold.woff2") format("woff2"); }
+
+:root {
+  --font: "IBM Plex Sans KR", sans-serif;
+  --w-regular: 400;
+  --w-medium: 500;
+  --w-semibold: 600;
+
+  /* 표시 화면 크기: 기준 단위 --u(화면 너비의 1%)에 곱하는 수 */
+  --s-body: 1.46;
+  --s-big: 2.6;
+  --s-corner: 0.9;
+  --s-head: 1.15;
+  --s-small: 1.1;
+  --s-notice-title: 1.7;
+  --s-label: 4;
+  --gap: 0.8;
+  --pad: 1.1;
+  --radius: 0.7;
+  --lh: 1.38;
+}

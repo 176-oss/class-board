@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>학급 게시판 입력</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="./css/tokens.css">
+<link rel="stylesheet" href="./css/board.css">
+<link rel="stylesheet" href="./css/admin.css">
+<script type="module" src="./js/admin/main.js"></script>
+</head>
+<body class="admin">
+<header class="top">
+  <p class="privacy"><strong>이름·연락처 같은 개인정보는 쓰지 마세요. 링크를 아는 사람은 누구나 볼 수 있습니다.</strong></p>
+  <div class="top-row">
+    <h1 id="board-title">학급 게시판 입력</h1>
+    <span id="fake-badge" class="pill is-fake" hidden>가짜 드라이브 모드</span>
+    <span id="share-state" class="pill" hidden></span>
+    <span id="dirty" class="dirty" hidden>저장하지 않은 변경이 있습니다</span>
+    <span class="grow"></span>
+    <button type="button" id="btn-unshare" class="btn danger" hidden>지금 공유 끊기</button>
+    <button type="button" id="btn-reshare" class="btn" hidden>다시 공유하기</button>
+    <button type="button" id="btn-boards" class="btn" hidden>게시판 목록</button>
+    <button type="button" id="btn-save" class="btn primary" aria-keyshortcuts="Control+S" aria-describedby="save-note" hidden>저장</button>
+  </div>
+  <p id="save-note" class="hint save-note" hidden>다른 PC에서 동시에 고치면 마지막에 저장한 내용이 남습니다. 저장 단축키 Ctrl+S</p>
+  <div class="live-row">
+    <p id="live" class="live" role="status" aria-live="polite"></p>
+    <div id="relogin" hidden><button type="button" id="btn-relogin" class="btn primary">다시 로그인</button></div>
+  </div>
+</header>
+
+<main id="start" class="start">
+  <div id="start-body"></div>
+</main>
+
+<main id="edit" class="edit" hidden>
+  <div class="editor">
+    <div id="tabs" class="tabs" role="tablist" aria-label="편집 항목"></div>
+    <div id="errors" class="errors" hidden></div>
+    <section id="panel" class="panel" role="tabpanel" tabindex="0"></section>
+  </div>
+  <aside class="preview-col" aria-labelledby="preview-h">
+    <h2 id="preview-h">학급 PC 미리보기</h2>
+    <p id="preview-note" class="hint"></p>
+    <div id="preview-frame" class="preview-frame"><div id="preview" class="cb-board" aria-hidden="true"></div></div>
+    <button type="button" id="preview-page" class="btn" hidden><span>다음 안내 페이지</span></button>
+  </aside>
+</main>
+</body>
+</html>
