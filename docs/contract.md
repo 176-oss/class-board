@@ -50,7 +50,7 @@
 | `js/admin/*.js` | 입력 화면 (`main.js`, `drive.js` = AdminDrive 실제 구현, 탭별 모듈, `image.js` canvas 처리). 안쪽 나눔은 B 자유 | B |
 | `tests/*.test.js` | A: core의 A 모듈 전부 + `sw-shell.test.js`(index.html이 불러오는 파일이 모두 `sw.js`의 `SHELL`에 있는지). B: fake-drive, diff, install, image-fit | A/B |
 | `tests/fixtures/board-sample.json`, `board-worst.json` | 정상 예시, 최악 데이터(기획서 16절 10번 분량) | A |
-| `docs/guide.md` | 선생님용 설치·운영 안내서 (기획서 12절, 9절 인수인계 한 문단) | B |
+| `docs/설치-운영-안내서.md` | 선생님용 설치·운영 안내서 (기획서 12절, 9절 인수인계 한 문단) | B |
 
 `config.js` 원문:
 ```js
@@ -573,15 +573,15 @@ uninstallBat(): string
 - 수동 순서(화면 원문): '1. Win+R을 누르고 shell:startup 을 입력합니다. 2. 열린 폴더 빈 곳에서 오른쪽 클릭 > 새로 만들기 > 바로 가기. 3. 항목 위치에 위 명령줄을 붙여 넣고 이름을 ClassBoard 로 합니다. 4. PC를 다시 켜서 게시판이 열리는지 봅니다. 끄려면 Alt+F4.' 수동 설치에는 시작 지연이 없다 (바로가기 대상 260자 제한). 표시 화면이 '연결 중'과 재시도로 네트워크가 늦게 붙는 경우를 처리한다.
 - 파일 이름: `ClassBoard-install.bat`, `ClassBoard-uninstall.bat` (영문. 기획서의 '설치.bat'은 영문 규칙에 맞춰 바꿈). Blob(`application/octet-stream`)으로 내려받기.
 - `installBat` 내용 규칙 (차례대로):
-  1. `@echo off`, `chcp 65001 >nul`, `setlocal`, `set "URL=<표시주소>"` (URL은 `displayUrl` 결과만. `%`, `&`, `"`, `^`가 있으면 throw).
+  1. `@echo off`, `setlocal`, (앞부분은 영문만. 한국어 Windows 10에서 2번째 줄의 `chcp 65001` 뒤에 한글이 있으면 bat 전체가 깨져, 한글 문구는 끝 구역에 모으고 그 바로 앞에서만 `chcp 65001`) `set "URL=<표시주소>"` (URL은 `displayUrl` 결과만. `%`, `&`, `"`, `^`가 있으면 throw).
   2. 브라우저 찾기, 먼저 찾은 것: `reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe" /ve` → 같은 키 HKCU → `%ProgramFiles%\Google\Chrome\Application\chrome.exe` → `%ProgramFiles(x86)%\...` → `%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe` → 엣지 App Paths `msedge.exe` → `%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe` → `%ProgramFiles%\...`. reg 결과는 `for /f "tokens=2,*" %%A in ('reg query ... /ve 2^>nul ^| find "REG_SZ"') do set "BROWSER=%%B"`. `(x86)`이 든 경로는 괄호 블록 안에 두지 않는다 (한 줄 `if not defined BROWSER if exist "..." set "BROWSER=..."`).
   3. 없으면 `echo 크롬과 엣지를 찾지 못했습니다. 수동 설치 방법을 따르세요.`, `pause`, `exit /b 1`.
   4. 시작 지연 실행 파일 `%LOCALAPPDATA%\ClassBoardLauncher\start.cmd` 쓰기: `@echo off` / `timeout /t 25 /nobreak >nul` / `start "" "<BROWSER>" --app=<URL> --start-fullscreen(또는 --kiosk) --user-data-dir="<LOCALAPPDATA 펼친 값>\ClassBoard" --hide-crash-restore-bubble`.
   5. PowerShell 한 번으로 바로가기 2개: 시작프로그램 `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\ClassBoard.lnk`(대상 start.cmd, `WindowStyle = 7` 최소화), 바탕화면 `[Environment]::GetFolderPath('Desktop')\ClassBoard.lnk`(대상 브라우저, 인수 위와 같음, 지연 없음). `powershell -NoProfile -Command "..."`에서 값은 bat의 `set` 변수를 `$env:`로 읽는다 (따옴표 섞임 방지).
   6. 확인: 두 `.lnk`가 있으면 `echo 설치했습니다. PC를 다시 켜면 게시판이 열립니다. 끄려면 Alt+F4.`, 없으면 `echo 바로가기를 만들지 못했습니다 (PowerShell이 막혀 있을 수 있습니다). 수동 설치 방법을 따르세요.` + `exit /b 1`. 끝에 `pause`.
-- `uninstallBat`: `chcp 65001`, 시작프로그램·바탕화면 `ClassBoard.lnk`와 `%LOCALAPPDATA%\ClassBoardLauncher` 삭제, `choice /c YN /m "학급 PC 화면이 보관한 내용(%LOCALAPPDATA%\ClassBoard)도 지울까요? 게시판 창을 먼저 닫으세요"` → Y면 `rmdir /s /q`. 결과 문구, `pause`.
+- `uninstallBat`: (한글 문구 직전에만 `chcp 65001`), 시작프로그램·바탕화면 `ClassBoard.lnk`와 `%LOCALAPPDATA%\ClassBoardLauncher` 삭제, `choice /c YN /m "학급 PC 화면이 보관한 내용(%LOCALAPPDATA%\ClassBoard)도 지울까요? 게시판 창을 먼저 닫으세요"` → Y면 `rmdir /s /q`. 결과 문구, `pause`.
 - 테스트(B): CRLF만 있음, `chcp 65001` 있음, URL이 그대로 들어감, 잘못된 파일 ID면 throw, kiosk 옵션 바뀜.
-- 안내서 `docs/guide.md`: 위 수동 순서, bat 사용법, Alt+F4, 키오스크 주의, 전원 옵션(화면 끄기·절전 안 함), '설정 > 시간 및 언어 > 지금 동기화', 자동 로그인, 초기화 프로그램 예외(`%LOCALAPPDATA%\ClassBoard`, 바로가기), 전근 시 파일 소유자 이전 한 문단, 구글 클라우드 설정(기획서 14절).
+- 안내서 `docs/설치-운영-안내서.md`: 위 수동 순서, bat 사용법, Alt+F4, 키오스크 주의, 전원 옵션(화면 끄기·절전 안 함), '설정 > 시간 및 언어 > 지금 동기화', 자동 로그인, 초기화 프로그램 예외(`%LOCALAPPDATA%\ClassBoard`, 바로가기), 전근 시 파일 소유자 이전 한 문단, 구글 클라우드 설정(기획서 14절).
 
 ## 12. 검수 보조 (기획서 16절과 연결)
 - 6번 검색 범위는 `spike/`를 뺀 저장소 전체. '`board/` 밖 변경 0개'는 '`spike/` 변경 0개, 다른 저장소 변경 0개'로 읽는다.
